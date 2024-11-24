@@ -51,6 +51,7 @@ def add(a,b):
     :param b: The second integer to be added.
     :return: The sum of the two integers.
     """
+    print("add called")
     return a + b
 
 load_dotenv()
@@ -58,17 +59,18 @@ load_dotenv()
 # def main(llm,webpage_contents:dict):
     # all_content = "\n".join([f"{url}:\n{content}" for url,content in webpage_contents.items()])
 def main(llm):
+    tools = [add]
+    llm_with_tools = bind_llm_to_tools(llm, tools)
     def chatbot(state: State):
-        return {"messages": [llm.invoke(state["messages"])]}
+        return {"messages": [llm_with_tools.invoke(state["messages"])]}
     # def assistant(state: MessagesState):
     #     sys_msg = SystemMessage(content="You are a helpful assistant tasked with performing arithmetic on a set of inputs.")
     #     return {"messages": [llm_with_tools.invoke([sys_msg] + state["messages"])]}
 
-    tools = [add]
+
     graph_builder = StateGraph(State)
-    # llm_with_tools = bind_llm_to_tools(llm,tools)
     graph_builder.add_node("chatbot", chatbot)
-    graph_builder.add_edge("chatbot", END)
+    # graph_builder.add_edge("chatbot", END)
 
 
     graph_builder.add_node("tools", ToolNode(tools))
@@ -95,20 +97,20 @@ def main(llm):
             for value in event.values():
                 print("Assistant:", value["messages"][-1].content)
 
-    # while True:
-    #     try:
-    #         user_input = input("User: ")
-    #         if user_input.lower() in ["quit", "exit", "q"]:
-    #             print("Goodbye!")
-    #             break
-    #
-    #         stream_graph_updates(graph,user_input)
-    #     except:
-    #         # fallback if input() is not available
-    #         user_input = "What do you know about LangGraph?"
-    #         print("User: " + user_input)
-    #         stream_graph_updates(graph, user_input)
-    #         break
+    while True:
+        try:
+            user_input = input("User: ")
+            if user_input.lower() in ["quit", "exit", "q"]:
+                print("Goodbye!")
+                break
+
+            stream_graph_updates(graph,user_input)
+        except:
+            # fallback if input() is not available
+            user_input = "What do you know about LangGraph?"
+            print("User: " + user_input)
+            stream_graph_updates(graph, user_input)
+            break
 
 if __name__ == "__main__":
     llm = ChatOpenAI(model="gpt-4o", temperature=0)
