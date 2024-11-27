@@ -71,6 +71,22 @@ config = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkh
 ```
 If on macOS, comment out the above config line in `main.py`.
 
+Remove the configuration argument from main.py line 
+
+`pdfkit.from_string(html_content, output_pdf_path, configuration=config)`
+
+it becomes 
+
+`pdfkit.from_string(html_content, output_pdf_path)`
+
+5. Remove records from the stakeholders_dict if not desired in `main.py`
+
+6. Set the `org_name` organization name(shorthand) which becomes the name of the folder that holds the audits.
+
+7. Set the `base_url` which is the full website with the protocol of the site. For example `https://www.labelmyemail.com` not `labelmyemail.com`. 
+
+
+
 There shouldn't be issues with paths between Windows, macOS, and Linux due to os.path.join which uses system path separators.
 
 ## License
